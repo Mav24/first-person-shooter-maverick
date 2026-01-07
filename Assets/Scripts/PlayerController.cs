@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// First-person controller for player movement and camera look
 /// Handles WASD movement, mouse look, jumping, and sprinting
+/// Uses Unity's new Input System
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -24,6 +26,67 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;
     private bool isGrounded;
     private float rotationX = 0;
+    
+    // Input System
+    private GameInputActions inputActions;
+    private Vector2 moveInput;
+    private Vector2 lookInput;
+    private bool isSprinting;
+    private bool jumpPressed;
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        
+        inputActions.Player.Move.performed += OnMove;
+        inputActions.Player.Move.canceled += OnMove;
+        inputActions.Player.Look.performed += OnLook;
+        inputActions.Player.Look.canceled += OnLook;
+        inputActions.Player.Sprint.performed += OnSprint;
+        inputActions.Player.Sprint.canceled += OnSprint;
+        inputActions.Player.Jump.performed += OnJump;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.Move.performed -= OnMove;
+        inputActions.Player.Move.canceled -= OnMove;
+        inputActions.Player.Look.performed -= OnLook;
+        inputActions.Player.Look.canceled -= OnLook;
+        inputActions.Player.Sprint.performed -= OnSprint;
+        inputActions.Player.Sprint.canceled -= OnSprint;
+        inputActions.Player.Jump.performed -= OnJump;
+        
+        inputActions.Player.Disable();
+    }
+    
+    private void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
+    }
+    
+    private void OnLook(InputAction.CallbackContext context)
+    {
+        lookInput = context.ReadValue<Vector2>();
+    }
+    
+    private void OnSprint(InputAction.CallbackContext context)
+    {
+        isSprinting = context.performed;
+    }
+    
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            jumpPressed = true;
+        }
+    }
     
     private void Start()
     {
@@ -56,24 +119,21 @@ public class PlayerController : MonoBehaviour
             velocity.y = -2f;
         }
         
-        // Get input
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
-        
-        // Calculate movement direction
-        Vector3 move = transform.right * moveX + transform.forward * moveZ;
+        // Calculate movement direction using new input
+        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         
         // Determine speed (sprint or walk)
-        float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
+        float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
         
         // Move the character
         characterController.Move(move * currentSpeed * Time.deltaTime);
         
         // Jumping
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (jumpPressed && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
+        jumpPressed = false;
         
         // Apply gravity
         velocity.y += gravity * Time.deltaTime;
@@ -84,9 +144,10 @@ public class PlayerController : MonoBehaviour
     {
         if (playerCamera == null) return;
         
-        // Get mouse input
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        // Get mouse input from new Input System
+        // Scale by sensitivity (note: mouse delta is already in pixels per frame)
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
         
         // Rotate camera up/down
         rotationX -= mouseY;

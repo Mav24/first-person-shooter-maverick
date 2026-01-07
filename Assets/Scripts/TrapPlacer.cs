@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Simple script to place traps in the world
 /// Attach to player or create trap placement system
+/// Uses Unity's new Input System
 /// </summary>
 public class TrapPlacer : MonoBehaviour
 {
@@ -16,7 +18,6 @@ public class TrapPlacer : MonoBehaviour
     [Header("Placement Settings")]
     public float placementRange = 5f;
     public LayerMask placementLayers;
-    public KeyCode placementKey = KeyCode.T;
     
     [Header("Current Trap")]
     public int currentTrapIndex = 0;
@@ -31,6 +32,39 @@ public class TrapPlacer : MonoBehaviour
     
     private Camera fpsCam;
     
+    // Input System
+    private GameInputActions inputActions;
+    private bool placeTrapPressed;
+    private int pendingTrapSelection = -1; // -1 means no selection pending
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        
+        inputActions.Player.PlaceTrap.performed += OnPlaceTrap;
+        inputActions.Player.SelectTrap1.performed += ctx => pendingTrapSelection = 0;
+        inputActions.Player.SelectTrap2.performed += ctx => pendingTrapSelection = 1;
+        inputActions.Player.SelectTrap3.performed += ctx => pendingTrapSelection = 2;
+        inputActions.Player.SelectTrap4.performed += ctx => pendingTrapSelection = 3;
+        inputActions.Player.SelectTrap5.performed += ctx => pendingTrapSelection = 4;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.PlaceTrap.performed -= OnPlaceTrap;
+        inputActions.Player.Disable();
+    }
+    
+    private void OnPlaceTrap(InputAction.CallbackContext context)
+    {
+        placeTrapPressed = true;
+    }
+    
     private void Start()
     {
         fpsCam = Camera.main;
@@ -38,16 +72,17 @@ public class TrapPlacer : MonoBehaviour
     
     private void Update()
     {
-        // Switch trap type with number keys
-        if (Input.GetKeyDown(KeyCode.Alpha1)) currentTrapIndex = 0;
-        if (Input.GetKeyDown(KeyCode.Alpha2)) currentTrapIndex = 1;
-        if (Input.GetKeyDown(KeyCode.Alpha3)) currentTrapIndex = 2;
-        if (Input.GetKeyDown(KeyCode.Alpha4)) currentTrapIndex = 3;
-        if (Input.GetKeyDown(KeyCode.Alpha5)) currentTrapIndex = 4;
+        // Switch trap type if a selection is pending
+        if (pendingTrapSelection >= 0)
+        {
+            currentTrapIndex = pendingTrapSelection;
+            pendingTrapSelection = -1;
+        }
         
         // Place trap
-        if (Input.GetKeyDown(placementKey))
+        if (placeTrapPressed)
         {
+            placeTrapPressed = false;
             PlaceTrap();
         }
     }
