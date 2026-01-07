@@ -94,7 +94,7 @@ public class RumBottleGrenade : MonoBehaviour
             rb = bottle.AddComponent<Rigidbody>();
         }
         
-        rb.velocity = throwDirection * throwForce;
+        rb.linearVelocity = throwDirection * throwForce;
         rb.angularVelocity = Random.insideUnitSphere * 5f; // Spinning bottle
         
         // Add bottle script if not present

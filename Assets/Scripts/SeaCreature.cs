@@ -161,7 +161,6 @@ public class SeaCreature : EnemyAI
     
     private void OnDrawGizmosSelected()
     {
-        base.OnDrawGizmosSelected();
         
         // Draw special ability range
         Gizmos.color = Color.cyan;

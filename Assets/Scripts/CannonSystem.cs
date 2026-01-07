@@ -227,7 +227,7 @@ public class CannonSystem : MonoBehaviour
             Rigidbody rb = cannonball.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.velocity = firePoint.forward * projectileSpeed;
+                rb.linearVelocity = firePoint.forward * projectileSpeed;
             }
             
             // Add cannonball script for impact detection

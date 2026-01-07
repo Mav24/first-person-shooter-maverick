@@ -81,7 +81,7 @@ public class EmpireSoldier : EnemyAI
             Rigidbody rb = projectile.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                rb.velocity = direction * 20f;
+                rb.linearVelocity = direction * 20f;
             }
             
             Destroy(projectile, 5f);
