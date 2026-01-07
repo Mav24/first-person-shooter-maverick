@@ -1,15 +1,16 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Rum bottle grenade weapon
 /// Explodes on impact and intoxicates nearby enemies
+/// Uses Unity's new Input System
 /// </summary>
 public class RumBottleGrenade : MonoBehaviour
 {
     [Header("Throw Settings")]
     public float throwForce = 15f;
     public float throwUpAngle = 30f;
-    public KeyCode throwKey = KeyCode.G;
     
     [Header("Grenade Prefab")]
     public GameObject bottlePrefab;
@@ -20,6 +21,32 @@ public class RumBottleGrenade : MonoBehaviour
     [Header("References")]
     public Transform throwPoint;
     public Camera fpsCam;
+    
+    // Input System
+    private GameInputActions inputActions;
+    private bool throwPressed;
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        inputActions.Player.ThrowGrenade.performed += OnThrowGrenade;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.ThrowGrenade.performed -= OnThrowGrenade;
+        inputActions.Player.Disable();
+    }
+    
+    private void OnThrowGrenade(InputAction.CallbackContext context)
+    {
+        throwPressed = true;
+    }
     
     private void Start()
     {
@@ -36,9 +63,14 @@ public class RumBottleGrenade : MonoBehaviour
     
     private void Update()
     {
-        if (Input.GetKeyDown(throwKey) && grenadeCount > 0)
+        if (throwPressed && grenadeCount > 0)
         {
+            throwPressed = false;
             ThrowGrenade();
+        }
+        else
+        {
+            throwPressed = false;
         }
     }
     

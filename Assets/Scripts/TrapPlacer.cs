@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Simple script to place traps in the world
 /// Attach to player or create trap placement system
+/// Uses Unity's new Input System
 /// </summary>
 public class TrapPlacer : MonoBehaviour
 {
@@ -16,7 +18,6 @@ public class TrapPlacer : MonoBehaviour
     [Header("Placement Settings")]
     public float placementRange = 5f;
     public LayerMask placementLayers;
-    public KeyCode placementKey = KeyCode.T;
     
     [Header("Current Trap")]
     public int currentTrapIndex = 0;
@@ -31,6 +32,74 @@ public class TrapPlacer : MonoBehaviour
     
     private Camera fpsCam;
     
+    // Input System
+    private GameInputActions inputActions;
+    private bool placeTrapPressed;
+    private bool selectTrap1Pressed;
+    private bool selectTrap2Pressed;
+    private bool selectTrap3Pressed;
+    private bool selectTrap4Pressed;
+    private bool selectTrap5Pressed;
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        
+        inputActions.Player.PlaceTrap.performed += OnPlaceTrap;
+        inputActions.Player.SelectTrap1.performed += OnSelectTrap1;
+        inputActions.Player.SelectTrap2.performed += OnSelectTrap2;
+        inputActions.Player.SelectTrap3.performed += OnSelectTrap3;
+        inputActions.Player.SelectTrap4.performed += OnSelectTrap4;
+        inputActions.Player.SelectTrap5.performed += OnSelectTrap5;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.PlaceTrap.performed -= OnPlaceTrap;
+        inputActions.Player.SelectTrap1.performed -= OnSelectTrap1;
+        inputActions.Player.SelectTrap2.performed -= OnSelectTrap2;
+        inputActions.Player.SelectTrap3.performed -= OnSelectTrap3;
+        inputActions.Player.SelectTrap4.performed -= OnSelectTrap4;
+        inputActions.Player.SelectTrap5.performed -= OnSelectTrap5;
+        
+        inputActions.Player.Disable();
+    }
+    
+    private void OnPlaceTrap(InputAction.CallbackContext context)
+    {
+        placeTrapPressed = true;
+    }
+    
+    private void OnSelectTrap1(InputAction.CallbackContext context)
+    {
+        selectTrap1Pressed = true;
+    }
+    
+    private void OnSelectTrap2(InputAction.CallbackContext context)
+    {
+        selectTrap2Pressed = true;
+    }
+    
+    private void OnSelectTrap3(InputAction.CallbackContext context)
+    {
+        selectTrap3Pressed = true;
+    }
+    
+    private void OnSelectTrap4(InputAction.CallbackContext context)
+    {
+        selectTrap4Pressed = true;
+    }
+    
+    private void OnSelectTrap5(InputAction.CallbackContext context)
+    {
+        selectTrap5Pressed = true;
+    }
+    
     private void Start()
     {
         fpsCam = Camera.main;
@@ -39,15 +108,23 @@ public class TrapPlacer : MonoBehaviour
     private void Update()
     {
         // Switch trap type with number keys
-        if (Input.GetKeyDown(KeyCode.Alpha1)) currentTrapIndex = 0;
-        if (Input.GetKeyDown(KeyCode.Alpha2)) currentTrapIndex = 1;
-        if (Input.GetKeyDown(KeyCode.Alpha3)) currentTrapIndex = 2;
-        if (Input.GetKeyDown(KeyCode.Alpha4)) currentTrapIndex = 3;
-        if (Input.GetKeyDown(KeyCode.Alpha5)) currentTrapIndex = 4;
+        if (selectTrap1Pressed) currentTrapIndex = 0;
+        if (selectTrap2Pressed) currentTrapIndex = 1;
+        if (selectTrap3Pressed) currentTrapIndex = 2;
+        if (selectTrap4Pressed) currentTrapIndex = 3;
+        if (selectTrap5Pressed) currentTrapIndex = 4;
+        
+        // Reset trap selection inputs
+        selectTrap1Pressed = false;
+        selectTrap2Pressed = false;
+        selectTrap3Pressed = false;
+        selectTrap4Pressed = false;
+        selectTrap5Pressed = false;
         
         // Place trap
-        if (Input.GetKeyDown(placementKey))
+        if (placeTrapPressed)
         {
+            placeTrapPressed = false;
             PlaceTrap();
         }
     }

@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Manages cannon firing mechanics
 /// Player can interact with cannons to fire at enemies
+/// Uses Unity's new Input System
 /// </summary>
 public class CannonSystem : MonoBehaviour
 {
@@ -22,7 +24,6 @@ public class CannonSystem : MonoBehaviour
     
     [Header("Interaction")]
     public float interactionRange = 3f;
-    public KeyCode useKey = KeyCode.E;
     
     [Header("Effects")]
     public ParticleSystem muzzleFlash;
@@ -34,6 +35,66 @@ public class CannonSystem : MonoBehaviour
     private Transform player;
     private PlayerController playerController;
     
+    // Input System
+    private GameInputActions inputActions;
+    private Vector2 aimInput;
+    private bool firePressed;
+    private bool interactPressed;
+    private bool exitPressed;
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        inputActions.Cannon.Enable();
+        
+        // Player action map for interaction when not using cannon
+        inputActions.Player.Interact.performed += OnInteract;
+        
+        // Cannon action map for when using cannon
+        inputActions.Cannon.Aim.performed += OnAim;
+        inputActions.Cannon.Aim.canceled += OnAim;
+        inputActions.Cannon.Fire.performed += OnFire;
+        inputActions.Cannon.Exit.performed += OnExit;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.Interact.performed -= OnInteract;
+        
+        inputActions.Cannon.Aim.performed -= OnAim;
+        inputActions.Cannon.Aim.canceled -= OnAim;
+        inputActions.Cannon.Fire.performed -= OnFire;
+        inputActions.Cannon.Exit.performed -= OnExit;
+        
+        inputActions.Player.Disable();
+        inputActions.Cannon.Disable();
+    }
+    
+    private void OnInteract(InputAction.CallbackContext context)
+    {
+        interactPressed = true;
+    }
+    
+    private void OnAim(InputAction.CallbackContext context)
+    {
+        aimInput = context.ReadValue<Vector2>();
+    }
+    
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        firePressed = true;
+    }
+    
+    private void OnExit(InputAction.CallbackContext context)
+    {
+        exitPressed = true;
+    }
+    
     private void Update()
     {
         if (isPlayerUsing)
@@ -44,6 +105,11 @@ public class CannonSystem : MonoBehaviour
         {
             CheckForPlayerInteraction();
         }
+        
+        // Reset one-shot inputs
+        interactPressed = false;
+        firePressed = false;
+        exitPressed = false;
     }
     
     private void CheckForPlayerInteraction()
@@ -65,7 +131,7 @@ public class CannonSystem : MonoBehaviour
         if (distance <= interactionRange)
         {
             // Show interaction prompt (in actual game, this would be UI)
-            if (Input.GetKeyDown(useKey))
+            if (interactPressed)
             {
                 StartUsingCannon();
             }
@@ -101,7 +167,7 @@ public class CannonSystem : MonoBehaviour
     private void HandleCannonControl()
     {
         // Exit cannon
-        if (Input.GetKeyDown(useKey))
+        if (exitPressed)
         {
             StopUsingCannon();
             return;
@@ -110,8 +176,8 @@ public class CannonSystem : MonoBehaviour
         // Aim cannon with mouse
         if (aimPivot != null)
         {
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
+            float mouseX = aimInput.x * 0.1f;
+            float mouseY = aimInput.y * 0.1f;
             
             // Rotate horizontally
             transform.Rotate(Vector3.up, mouseX * 2f);
@@ -128,7 +194,7 @@ public class CannonSystem : MonoBehaviour
         }
         
         // Fire cannon
-        if (Input.GetButtonDown("Fire1") && !isReloading)
+        if (firePressed && !isReloading)
         {
             FireCannon();
         }

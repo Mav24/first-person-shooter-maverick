@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// Base class for weapons in the game
 /// Handles shooting, reloading, and ammo management
+/// Uses Unity's new Input System
 /// </summary>
 public class WeaponSystem : MonoBehaviour
 {
@@ -32,6 +34,51 @@ public class WeaponSystem : MonoBehaviour
     private float nextTimeToFire = 0f;
     public bool isReloading = false;
     
+    // Input System
+    private GameInputActions inputActions;
+    private bool fireHeld;
+    private bool firePressed;
+    private bool reloadPressed;
+    
+    private void Awake()
+    {
+        inputActions = new GameInputActions();
+    }
+    
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+        
+        inputActions.Player.Fire.performed += OnFire;
+        inputActions.Player.Fire.canceled += OnFireCanceled;
+        inputActions.Player.Reload.performed += OnReload;
+    }
+    
+    private void OnDisable()
+    {
+        inputActions.Player.Fire.performed -= OnFire;
+        inputActions.Player.Fire.canceled -= OnFireCanceled;
+        inputActions.Player.Reload.performed -= OnReload;
+        
+        inputActions.Player.Disable();
+    }
+    
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        fireHeld = true;
+        firePressed = true;
+    }
+    
+    private void OnFireCanceled(InputAction.CallbackContext context)
+    {
+        fireHeld = false;
+    }
+    
+    private void OnReload(InputAction.CallbackContext context)
+    {
+        reloadPressed = true;
+    }
+    
     private void Start()
     {
         currentAmmo = maxAmmo;
@@ -48,8 +95,9 @@ public class WeaponSystem : MonoBehaviour
         if (isReloading) return;
         
         // Check for reload input
-        if (Input.GetKeyDown(KeyCode.R))
+        if (reloadPressed)
         {
+            reloadPressed = false;
             StartReload();
             return;
         }
@@ -64,18 +112,20 @@ public class WeaponSystem : MonoBehaviour
         // Handle shooting
         if (isAutomatic)
         {
-            if (Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
+            if (fireHeld && Time.time >= nextTimeToFire)
             {
                 Shoot();
             }
         }
         else
         {
-            if (Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
+            if (firePressed && Time.time >= nextTimeToFire)
             {
                 Shoot();
             }
         }
+        
+        firePressed = false;
     }
     
     private void Shoot()
