@@ -145,8 +145,9 @@ public class PlayerController : MonoBehaviour
         if (playerCamera == null) return;
         
         // Get mouse input from new Input System
-        float mouseX = lookInput.x * mouseSensitivity * 0.01f;
-        float mouseY = lookInput.y * mouseSensitivity * 0.01f;
+        // Scale by sensitivity (note: mouse delta is already in pixels per frame)
+        float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
+        float mouseY = lookInput.y * mouseSensitivity * Time.deltaTime;
         
         // Rotate camera up/down
         rotationX -= mouseY;

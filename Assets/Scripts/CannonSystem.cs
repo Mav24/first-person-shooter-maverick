@@ -24,6 +24,7 @@ public class CannonSystem : MonoBehaviour
     
     [Header("Interaction")]
     public float interactionRange = 3f;
+    public float aimSensitivity = 0.1f;
     
     [Header("Effects")]
     public ParticleSystem muzzleFlash;
@@ -176,8 +177,8 @@ public class CannonSystem : MonoBehaviour
         // Aim cannon with mouse
         if (aimPivot != null)
         {
-            float mouseX = aimInput.x * 0.1f;
-            float mouseY = aimInput.y * 0.1f;
+            float mouseX = aimInput.x * aimSensitivity;
+            float mouseY = aimInput.y * aimSensitivity;
             
             // Rotate horizontally
             transform.Rotate(Vector3.up, mouseX * 2f);
