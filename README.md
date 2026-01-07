@@ -93,7 +93,7 @@ Assets/
 ├── Scripts/           # Core game scripts
 │   ├── PlayerController.cs
 │   ├── EnemyAI.cs
-│   ├── DrunkennesSystem.cs
+│   ├── DrunkennessSystem.cs
 │   ├── WeaponSystem.cs
 │   ├── TrapSystem.cs
 │   ├── CannonSystem.cs

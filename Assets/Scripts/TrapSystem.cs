@@ -21,7 +21,7 @@ public class TrapSystem : MonoBehaviour
     public TrapType trapType = TrapType.BarrelBomb;
     public float triggerRadius = 2f;
     public float damage = 50f;
-    public float drunkennesAmount = 40f;
+    public float drunkennessAmount = 40f;
     public float immobilizeDuration = 3f;
     
     [Header("Effects")]
@@ -103,10 +103,10 @@ public class TrapSystem : MonoBehaviour
             if (hitCollider.CompareTag("Enemy") || hitCollider.CompareTag("Pirate") || 
                 hitCollider.CompareTag("EmpireSoldier") || hitCollider.CompareTag("SeaCreature"))
             {
-                DrunkennesSystem drunkenness = hitCollider.GetComponent<DrunkennesSystem>();
+                DrunkennessSystem drunkenness = hitCollider.GetComponent<DrunkennessSystem>();
                 if (drunkenness != null)
                 {
-                    drunkenness.AddDrunkenness(drunkennesAmount);
+                    drunkenness.AddDrunkenness(drunkennessAmount);
                 }
             }
         }

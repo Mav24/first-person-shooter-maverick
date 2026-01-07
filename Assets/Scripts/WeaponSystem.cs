@@ -30,7 +30,7 @@ public class WeaponSystem : MonoBehaviour
     public Camera fpsCam;
     
     private float nextTimeToFire = 0f;
-    private bool isReloading = false;
+    public bool isReloading = false;
     
     private void Start()
     {

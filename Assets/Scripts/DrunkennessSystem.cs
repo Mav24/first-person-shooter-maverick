@@ -16,7 +16,7 @@ public enum DrunkenState
 /// Manages the drunkenness level of enemies
 /// Affects movement speed, accuracy, and behavior
 /// </summary>
-public class DrunkennesSystem : MonoBehaviour
+public class DrunkennessSystem : MonoBehaviour
 {
     [Header("Drunkenness Settings")]
     [Range(0f, 100f)]

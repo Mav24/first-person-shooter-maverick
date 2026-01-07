@@ -84,7 +84,7 @@ public class BarrelHealth : MonoBehaviour
             if (hitCollider.CompareTag("Enemy") || hitCollider.CompareTag("Pirate") || 
                 hitCollider.CompareTag("EmpireSoldier") || hitCollider.CompareTag("SeaCreature"))
             {
-                DrunkennesSystem drunkenness = hitCollider.GetComponent<DrunkennesSystem>();
+                DrunkennessSystem drunkenness = hitCollider.GetComponent<DrunkennessSystem>();
                 if (drunkenness != null)
                 {
                     drunkenness.AddDrunkenness(rumDrunkennessAmount);

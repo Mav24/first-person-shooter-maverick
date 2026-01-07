@@ -22,14 +22,14 @@ public class EnemyAI : MonoBehaviour
     public float baseSpeed = 3.5f;
     
     protected NavMeshAgent agent;
-    protected DrunkennesSystem drunkennessSystem;
+    protected DrunkennessSystem drunkennessSystem;
     protected float lastAttackTime;
     protected Transform currentTarget;
     
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        drunkennessSystem = GetComponent<DrunkennesSystem>();
+        drunkennessSystem = GetComponent<DrunkennessSystem>();
         
         // Try to find player if not assigned
         if (player == null)

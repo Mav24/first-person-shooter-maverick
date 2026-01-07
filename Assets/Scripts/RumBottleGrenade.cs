@@ -134,7 +134,7 @@ public class RumBottle : MonoBehaviour
                 }
                 
                 // Apply drunkenness
-                DrunkennesSystem drunkenness = hitCollider.GetComponent<DrunkennesSystem>();
+                DrunkennessSystem drunkenness = hitCollider.GetComponent<DrunkennessSystem>();
                 if (drunkenness != null)
                 {
                     float distance = Vector3.Distance(transform.position, hitCollider.transform.position);
