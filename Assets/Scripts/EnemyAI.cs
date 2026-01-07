@@ -21,10 +21,10 @@ public class EnemyAI : MonoBehaviour
     [Header("Movement")]
     public float baseSpeed = 3.5f;
     
-    private NavMeshAgent agent;
-    private DrunkennesSystem drunkennessSystem;
-    private float lastAttackTime;
-    private Transform currentTarget;
+    protected NavMeshAgent agent;
+    protected DrunkennesSystem drunkennessSystem;
+    protected float lastAttackTime;
+    protected Transform currentTarget;
     
     private void Start()
     {
@@ -55,7 +55,7 @@ public class EnemyAI : MonoBehaviour
         SelectTarget();
     }
     
-    private void Update()
+    protected virtual void Update()
     {
         if (currentTarget == null)
         {
@@ -97,7 +97,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
-    private void SelectTarget()
+    protected virtual void SelectTarget()
     {
         // Randomly decide between attacking player or barrels
         // More likely to target barrels (60% chance)
